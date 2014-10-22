@@ -31,10 +31,13 @@
 
 #include "spm_crc.h"
 
+#define SPM_CRC_INIT        0xFF
+#define SPM_CRC_MASK        0xFF
+
 unsigned int spm_crc(const unsigned char *data, unsigned int size) {
-    unsigned int crc = 0xFF;
+    unsigned int crc = SPM_CRC_INIT;
     for (unsigned int i = 0; i < size; i++) {
         crc += data[i];
     }
-    return 0xFF & crc;
+    return SPM_CRC_MASK & crc;
 }
