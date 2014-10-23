@@ -61,27 +61,25 @@
 #define SPM_INIT(io_write, mutex_lock, mutex_unlock)\
     {\
         .mutex = {mutex_lock, mutex_unlock},\
+        .state = spm_state_sync,\
         .write = io_write,\
         .buffer = {{0}, 0},\
         .tx = {{0, 0, 0, NULL}},\
         .rx = {{0, 0, 0, NULL}},\
     }
-#else
-#define SPM_INIT(io_write)\
-    {\
-        .write = io_write,\
-        .buffer = {{0}, 0},\
-        .tx = {{0, 0, 0, NULL}},\
-        .rx = {{0, 0, 0, NULL}},\
-    }
-#endif /* SPM_THREAD_ENABLE */
-
-#if SPM_THREAD_ENABLE
 #define SPM_MUTEX_LOCK(inst)\
         if (NULL != (inst)->mutex.lock) (inst)->mutex.lock()
 #define SPM_MUTEX_UNLOCK(inst)\
         if (NULL != (inst)->mutex.unlock) (inst)->mutex.unlock()
 #else
+#define SPM_INIT(io_write)\
+    {\
+        .state = spm_state_sync,\
+        .write = io_write,\
+        .buffer = {{0}, 0},\
+        .tx = {{0, 0, 0, NULL}},\
+        .rx = {{0, 0, 0, NULL}},\
+    }
 #define SPM_MUTEX_LOCK(inst)
 #define SPM_MUTEX_UNLOCK(inst)
 #endif /* SPM_THREAD_ENABLE */
@@ -112,6 +110,8 @@ typedef int (*spm_write_handler_t)(
         const unsigned char *data, unsigned int size);
 
 typedef void (*spm_state_handler_t)(struct spm *inst, unsigned int data);
+
+void spm_state_sync(struct spm *inst, unsigned int sync);
 
 struct spm_mutex {
     void (*lock)(void);
@@ -150,7 +150,9 @@ struct spm_frame {
     uint8_t data[];
 }SPM_PACKED;
 
-void spm_dispatch(struct spm *inst, unsigned int data);
+SPM_INLINE void spm_dispatch(struct spm *inst, unsigned int data) {
+    inst->state(inst, data);
+}
 
 int spm_send_request(struct spm *inst, spm_handler_t handler,
         unsigned int command, const void *data, unsigned int size);

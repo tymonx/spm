@@ -37,13 +37,6 @@
 
 #define MAX_DATA_SIZE         255
 
-void spm_dispatch(struct spm *inst, unsigned int data) {
-    if (NULL == inst->state) {
-        inst->state = spm_state_sync;
-    }
-    inst->state(inst, data);
-}
-
 static int spm_send_frame(struct spm *inst, unsigned int control,
         unsigned int command, const unsigned char *data, unsigned int size) {
     if (NULL == inst->write) return SPM_ERROR_SEND;
