@@ -32,8 +32,18 @@
 #include "spm_requests.h"
 #include "spm_commands.h"
 
+#define WEAK                    SPM_WEAK(spm_default_cmd)
+
 #define SPM_CMD(DNAME, fname)\
     case SPM_##DNAME##_CMD: { handler = spm_##fname##_cmd; } break
+
+static void spm_default_cmd(struct spm *inst, unsigned int status,
+        unsigned int command, const void *data, unsigned int size);
+
+WEAK SPM_CMD_FUNC(ping);
+WEAK SPM_CMD_FUNC(get_fw_version);
+WEAK SPM_CMD_FUNC(set_byte);
+WEAK SPM_CMD_FUNC(get_byte);
 
 spm_handler_t spm_get_request_handler(unsigned int command) {
     spm_handler_t handler;
@@ -49,4 +59,13 @@ spm_handler_t spm_get_request_handler(unsigned int command) {
     }
 
     return handler;
+}
+
+static void spm_default_cmd(struct spm *inst, unsigned int status,
+        unsigned int command, const void *data, unsigned int size) {
+    (void)status;
+    (void)data;
+    (void)size;
+
+    spm_send_error(inst, SPM_INVALID_COMMAND, command);
 }

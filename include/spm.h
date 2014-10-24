@@ -46,6 +46,7 @@
 #define SPM_PACKED                              __attribute__((packed))
 #define SPM_INLINE                              static inline
 #define SPM_ARRAY_SIZE(array)                   (sizeof(array)/sizeof(array[0]))
+#define SPM_WEAK(f)                             __attribute__((weak, alias(#f)))
 
 #define SPM_FRAME_SYNC                          0x3A
 
@@ -88,7 +89,7 @@ enum spm_status {
     SPM_SUCCESS                                 = 0,
     SPM_ERROR_FULL                              = 1,
     SPM_ERROR_SEND                              = 2,
-    SPM_ERROR_BUSY                              = 3,
+    SPM_ERROR_BUSY                              = 3
 };
 
 enum spm_response_status {
@@ -96,7 +97,7 @@ enum spm_response_status {
     SPM_BUSY                                    = 1,
     SPM_TIMEOUT                                 = 2,
     SPM_INVALID_CRC                             = 3,
-    SPM_INVALID_COMMAND                         = 4,
+    SPM_INVALID_COMMAND                         = 4
 };
 
 struct spm;
