@@ -31,6 +31,11 @@
 
 #include "spm.h"
 
+SPM_CMD_FUNC(ping);
+SPM_CMD_FUNC(get_fw_version);
+SPM_CMD_FUNC(set_byte);
+SPM_CMD_FUNC(get_byte);
+
 SPM_CMD_FUNC(ping) {
     /* Send pong after ping */
     if (SPM_OK == status) {
@@ -40,13 +45,13 @@ SPM_CMD_FUNC(ping) {
 
 SPM_CMD_FUNC(get_fw_version) {
     (void)data;
+    (void)size;
     struct spm_get_fw_version_response fw_version = {
         .major  = 1,
         .minor  = 0,
         .bugfix = 0,
         .build  = 0,
     };
-    (void)size;
     /* Send pong after ping */
     if (SPM_OK == status) {
         spm_send_response(inst, SPM_OK, command,

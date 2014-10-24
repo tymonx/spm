@@ -35,10 +35,10 @@
 int spm_buffer_write(struct spm *inst, unsigned int data) {
     if (inst->buffer.index < SPM_BUFFER_SIZE) {
         inst->buffer.data[inst->buffer.index++] = (unsigned char)data;
-        return SPM_SUCCESS;
+        return SPM_OK;
     }
 
-    return SPM_ERROR_FULL;
+    return SPM_ERROR;
 }
 
 void spm_buffer_shift_and_redispatch(struct spm *inst, unsigned int data) {

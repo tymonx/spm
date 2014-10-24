@@ -40,14 +40,14 @@ static void spm_substate_response(struct spm *inst);
 void spm_state_sync(struct spm *inst, unsigned int sync) {
     if (SPM_FRAME_SYNC == sync) {
         spm_buffer_reset(inst);
-        if (SPM_SUCCESS == spm_buffer_write(inst, sync)) {
+        if (SPM_OK == spm_buffer_write(inst, sync)) {
             spm_state_next(inst, spm_state_control);
         }
     }
 }
 
 void spm_state_control(struct spm *inst, unsigned int control) {
-    if (SPM_SUCCESS == spm_buffer_write(inst, control)) {
+    if (SPM_OK == spm_buffer_write(inst, control)) {
         spm_state_next(inst, spm_state_command);
     } else {
         spm_buffer_shift_and_redispatch(inst, control);
@@ -55,7 +55,7 @@ void spm_state_control(struct spm *inst, unsigned int control) {
 }
 
 void spm_state_command(struct spm *inst, unsigned int command) {
-    if (SPM_SUCCESS == spm_buffer_write(inst, command)) {
+    if (SPM_OK == spm_buffer_write(inst, command)) {
         spm_state_next(inst, spm_state_size);
     } else {
         spm_buffer_shift_and_redispatch(inst, command);
@@ -63,7 +63,7 @@ void spm_state_command(struct spm *inst, unsigned int command) {
 }
 
 void spm_state_size(struct spm *inst, unsigned int size) {
-    if (SPM_SUCCESS == spm_buffer_write(inst, size)) {
+    if (SPM_OK == spm_buffer_write(inst, size)) {
         if (0 == size) {
             spm_state_next(inst, spm_state_crc);
         } else {
@@ -76,7 +76,7 @@ void spm_state_size(struct spm *inst, unsigned int size) {
 }
 
 void spm_state_data(struct spm *inst, unsigned int data) {
-    if (SPM_SUCCESS == spm_buffer_write(inst, data)) {
+    if (SPM_OK == spm_buffer_write(inst, data)) {
         inst->data_count--;
         if (0 == inst->data_count) {
             spm_state_next(inst, spm_state_crc);
@@ -87,7 +87,7 @@ void spm_state_data(struct spm *inst, unsigned int data) {
 }
 
 void spm_state_crc(struct spm *inst, unsigned int crc) {
-    if (SPM_SUCCESS == spm_buffer_write(inst, crc)) {
+    if (SPM_OK == spm_buffer_write(inst, crc)) {
         struct spm_frame *frame = spm_buffer_get_frame(inst);
         if (spm_crc(inst->buffer.data,
                     SPM_FRAME_HEADER_SIZE + frame->size) == crc) {

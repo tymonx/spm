@@ -39,8 +39,8 @@
 
 static int spm_send_frame(struct spm *inst, unsigned int control,
         unsigned int command, const unsigned char *data, unsigned int size) {
-    if (NULL == inst->write) return SPM_ERROR_SEND;
-    if (MAX_DATA_SIZE < size) return SPM_ERROR_SEND;
+    if (NULL == inst->write) return SPM_ERROR;
+    if (MAX_DATA_SIZE < size) return SPM_ERROR;
 
     SPM_MUTEX_UNLOCK(inst);
 
@@ -67,7 +67,7 @@ static int spm_send_frame(struct spm *inst, unsigned int control,
 int spm_send_request(struct spm *inst, spm_handler_t handler,
         unsigned int command, const void *data, unsigned int size) {
 
-    int status = SPM_ERROR_BUSY;
+    int status = SPM_BUSY;
     struct spm_request *request = inst->tx;
 
     SPM_MUTEX_LOCK(inst);
@@ -80,7 +80,7 @@ int spm_send_request(struct spm *inst, spm_handler_t handler,
             request->handler = handler;
             status = spm_send_frame(inst, SPM_CTRL_REQUEST,
                     command, data, size);
-            if (SPM_SUCCESS != status) {
+            if (SPM_OK != status) {
                 request->handler = NULL;
             }
             break;
@@ -95,7 +95,7 @@ int spm_send_request(struct spm *inst, spm_handler_t handler,
 int spm_send_response(struct spm *inst, unsigned int resp_status,
         unsigned int command, const void *data, unsigned int size) {
 
-    int status = SPM_ERROR_BUSY;
+    int status = SPM_BUSY;
     struct spm_request *request = inst->rx;
 
     SPM_MUTEX_LOCK(inst);
@@ -104,7 +104,7 @@ int spm_send_response(struct spm *inst, unsigned int resp_status,
         if ((NULL != request->handler) && (command == request->command)) {
             status = spm_send_frame(inst, SPM_CTRL_STATUS_MASK & resp_status,
                     command, data, size);
-            if (SPM_SUCCESS == status) {
+            if (SPM_OK == status) {
                 request->handler = NULL;
             }
             break;

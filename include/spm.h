@@ -85,24 +85,23 @@
 #define SPM_MUTEX_UNLOCK(inst)
 #endif /* SPM_THREAD_ENABLE */
 
-enum spm_status {
-    SPM_SUCCESS                                 = 0,
-    SPM_ERROR_FULL                              = 1,
-    SPM_ERROR_SEND                              = 2,
-    SPM_ERROR_BUSY                              = 3
-};
+#define SPM_CMD_FUNC(name)\
+    void spm_##name##_cmd(struct spm *inst, unsigned int status,\
+            unsigned int command, const void *data, unsigned int size)
 
-enum spm_response_status {
+#include "spm_commands.h"
+
+enum spm_status {
     SPM_OK                                      = 0,
     SPM_BUSY                                    = 1,
-    SPM_TIMEOUT                                 = 2,
-    SPM_INVALID_CRC                             = 3,
-    SPM_INVALID_COMMAND                         = 4
+    SPM_ERROR                                   = 2,
+    SPM_TIMEOUT                                 = 3,
+    SPM_INVALID_CRC                             = 4,
+    SPM_INVALID_SIZE                            = 5,
+    SPM_INVALID_COMMAND                         = 6
 };
 
 struct spm;
-
-#include "spm_commands.h"
 
 typedef void (*spm_handler_t)(struct spm *inst, unsigned int status,
         unsigned int command, const void *data, unsigned int size);

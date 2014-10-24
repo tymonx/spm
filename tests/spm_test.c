@@ -50,7 +50,7 @@ static int uart1_write(const unsigned char *data, unsigned int size) {
     for (unsigned int i = 0; i < size; i++) {
         spm_dispatch(&spm2, data[i]);
     }
-    return SPM_SUCCESS;
+    return SPM_OK;
 }
 
 static int uart2_write(const unsigned char *data, unsigned int size) {
@@ -66,7 +66,7 @@ static int uart2_write(const unsigned char *data, unsigned int size) {
         spm_dispatch(&spm1, data[i]);
     }
 
-    return SPM_SUCCESS;
+    return SPM_OK;
 }
 
 static void spm1_ping_response(struct spm *inst, unsigned int status,

@@ -34,10 +34,6 @@
 
 #include "spm.h"
 
-#define SPM_CMD_FUNC(name)\
-    void spm_##name##_cmd(struct spm *inst, unsigned int status,\
-            unsigned int command, const void *data, unsigned int size)
-
 /* Ping */
 #define SPM_PING_CMD                            0x00
 #define SPM_PING_RQST_SIZE                      0
