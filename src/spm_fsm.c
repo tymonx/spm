@@ -34,44 +34,38 @@
 #include "spm_buffer.h"
 #include "spm_requests.h"
 
+#if SPM_BUFFER_SIZE < 5
+#error "Buffer size is too small, it must have enough space for minimal frame"
+#endif
+
 static void spm_substate_request(struct spm *inst);
 static void spm_substate_response(struct spm *inst);
 
 void spm_state_sync(struct spm *inst, unsigned int sync) {
     if (SPM_FRAME_SYNC == sync) {
         spm_buffer_reset(inst);
-        if (SPM_OK == spm_buffer_write(inst, sync)) {
-            spm_state_next(inst, spm_state_control);
-        }
+        spm_buffer_write(inst, sync);
+        spm_state_next(inst, spm_state_control);
     }
 }
 
 void spm_state_control(struct spm *inst, unsigned int control) {
-    if (SPM_OK == spm_buffer_write(inst, control)) {
-        spm_state_next(inst, spm_state_command);
-    } else {
-        spm_buffer_shift_and_redispatch(inst, control);
-    }
+    spm_buffer_write(inst, control);
+    spm_state_next(inst, spm_state_command);
 }
 
 void spm_state_command(struct spm *inst, unsigned int command) {
-    if (SPM_OK == spm_buffer_write(inst, command)) {
-        spm_state_next(inst, spm_state_size);
-    } else {
-        spm_buffer_shift_and_redispatch(inst, command);
-    }
+    spm_buffer_write(inst, command);
+    spm_state_next(inst, spm_state_size);
 }
 
 void spm_state_size(struct spm *inst, unsigned int size) {
-    if (SPM_OK == spm_buffer_write(inst, size)) {
-        if (0 == size) {
-            spm_state_next(inst, spm_state_crc);
-        } else {
-            inst->data_count = (uint16_t)size;
-            spm_state_next(inst, spm_state_data);
-        }
+    spm_buffer_write(inst, size);
+    if (0 == size) {
+        spm_state_next(inst, spm_state_crc);
     } else {
-        spm_buffer_shift_and_redispatch(inst, size);
+        inst->data_count = (uint16_t)size;
+        spm_state_next(inst, spm_state_data);
     }
 }
 
